@@ -22,6 +22,10 @@ import { SearchContextProvider } from "./SearchContext";
 import reportWebVitals, { sendToGoogleAnalytics } from "./reportWebVitals";
 import { useTranslation } from "react-i18next";
 import RedirectPage from "./pages/RedirectPage";
+import { initializeFirebase } from "./firebase";
+
+const { app, analytics } = initializeFirebase();
+console.log(app, analytics);
 
 const Home = loadable(() => import("./pages/Home"));
 const RouteEta = loadable(() => import("./pages/RouteEta"));
