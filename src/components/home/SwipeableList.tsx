@@ -10,7 +10,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-  styled
+  styled,
 } from "@mui/material";
 import {
   EtaDb,
@@ -36,7 +36,8 @@ import { isHoliday, isRouteAvaliable } from "../../timetable";
 import { RouteCollection, TransportType } from "../../typing";
 import { coToType, getDistance, getDistanceWithUnit } from "../../utils";
 import { CircularProgress } from "../Progress";
-import { dialogTitleSx } from "../ui/dialog";
+import { BasicMap } from "../map/BasicMap";
+import { dialogRootSx, dialogTitleSx } from "../ui/dialog";
 import HomeRouteListDropDown from "./HomeRouteList";
 import type { HomeTabType } from "./HomeTabbar";
 import SuccinctTimeReport from "./SuccinctTimeReport";
@@ -75,7 +76,6 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       setLastSearchRange,
       customSearchRange,
       setCustomSearchRange,
-      colorMode,
     } = useContext(AppContext);
     const isTodayHoliday = useMemo(
       () => isHoliday(holidays, new Date()),
@@ -257,21 +257,12 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
             onClose={() => {
               setOpen(false);
             }}
-            sx={{
-              "& .MuiPaper-root": {
-                inset: "0px",
-                margin: "auto",
-                border: ({ palette }) =>
-                  colorMode === "dark" &&
-                  `1px solid ${palette.background.contrast}`,
-              },
-            }}
+            sx={dialogRootSx}
           >
             <DialogTitle sx={dialogTitleSx}>
               {t("自訂搜尋範圍（米）")}
             </DialogTitle>
-            {/* TODO The map will be added later */}
-            {/* <DialogContent>Map</DialogContent> */}
+            <BasicMap range={parseInt(inputValue) || 0}></BasicMap>
             <Box
               sx={{
                 display: "flex",
@@ -287,6 +278,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                 value={inputValue}
                 min="0"
                 max="9999"
+                step={100}
                 onChange={(e) => {
                   const value = e.target.value;
                   const numericalValue = parseInt(value);
@@ -328,7 +320,6 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       open,
       customSearchRange,
       inputValue,
-      colorMode,
       setLastSearchRange,
       setCustomSearchRange,
     ]);
