@@ -3,8 +3,10 @@ import {
   Button,
   Dialog,
   DialogTitle,
+  Grid,
   List,
   Paper,
+  Slider,
   SxProps,
   Theme,
   ToggleButton,
@@ -76,6 +78,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       setLastSearchRange,
       customSearchRange,
       setCustomSearchRange,
+      updateGeolocation,
     } = useContext(AppContext);
     const isTodayHoliday = useMemo(
       () => isHoliday(holidays, new Date()),
@@ -94,6 +97,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
     const [inputValue, setInputValue] = useState<string>(
       isCustomRange ? customSearchRange?.toString() : ""
     );
+    const [position, setPosition] = useState(geolocation);
     const [hasNoNearbyRoutes, setHasNoNearbyRoutes] = useState(true);
 
     useImperativeHandle(ref, () => ({
@@ -262,52 +266,80 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
             <DialogTitle sx={dialogTitleSx}>
               {t("自訂搜尋範圍（米）")}
             </DialogTitle>
-            <BasicMap range={parseInt(inputValue) || 0}></BasicMap>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                gap: 2,
-                padding: 2,
-              }}
-            >
-              <input
-                style={{ flex: 1 }}
-                type="number"
-                defaultValue={customSearchRange}
-                value={inputValue}
-                min="0"
-                max="9999"
-                step={100}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  const numericalValue = parseInt(value);
-                  const [min, max] = [0, 9999];
-                  if (numericalValue <= min) {
-                    setInputValue(min.toString());
-                  } else if (numericalValue >= max) {
-                    setInputValue(max.toString());
-                  } else setInputValue(value);
-                }}
-              />
-              <Button
-                disableRipple
-                variant="contained"
-                sx={{
-                  flex: 1,
-                  color: "black",
-                }}
-                onClick={() => {
-                  setSelectedRange("custom");
-                  const range = parseInt(inputValue);
-                  setLastSearchRange(range);
-                  setCustomSearchRange(range);
-                  setOpen(false);
-                }}
-              >
-                {t("確定")}
-              </Button>
-            </Box>
+            <BasicMap
+              range={parseInt(inputValue) || 0}
+              position={position}
+              setPosition={setPosition}
+            ></BasicMap>
+            <Grid container sx={{ px: 4, py: 1, mt: 2 }} spacing={1}>
+              <Grid item xs={12}>
+                <Slider
+                  sx={{
+                    "& .MuiSlider-mark": {
+                      backgroundColor: "#bfbfbf",
+                      height: 8,
+                    },
+                  }}
+                  aria-label="Range"
+                  defaultValue={750}
+                  value={parseInt(inputValue)}
+                  valueLabelDisplay="auto"
+                  marks={[
+                    { label: "0", value: 0 },
+                    { label: "1km", value: 1000 },
+                    { label: "2km", value: 2000 },
+                    { label: "3km", value: 3000 },
+                    { label: "4km", value: 4000 },
+                    { label: "5km", value: 5000 },
+                  ]}
+                  min={0}
+                  max={5000}
+                  step={250}
+                  onChange={(e, value) => setInputValue(value.toString())}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <input
+                  style={{ fontSize: "16px", width: "100%", height: "100%" }}
+                  type="number"
+                  defaultValue={customSearchRange}
+                  value={inputValue}
+                  min="0"
+                  max="9999"
+                  step={100}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const numericalValue = parseInt(value);
+                    const [min, max] = [0, 9999];
+                    if (numericalValue <= min) {
+                      setInputValue(min.toString());
+                    } else if (numericalValue >= max) {
+                      setInputValue(max.toString());
+                    } else setInputValue(value);
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Button
+                  disableRipple
+                  variant="contained"
+                  sx={{
+                    color: "black",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    setSelectedRange("custom");
+                    const range = parseInt(inputValue);
+                    setLastSearchRange(range);
+                    setCustomSearchRange(range);
+                    updateGeolocation({ lat: 22.33971, lng: 114.20154 });
+                    setOpen(false);
+                  }}
+                >
+                  {t("確定")}
+                </Button>
+              </Grid>
+            </Grid>
           </Dialog>
         </>
       ) : (
@@ -318,10 +350,12 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       hasNoNearbyRoutes,
       t,
       open,
-      customSearchRange,
       inputValue,
+      position,
+      customSearchRange,
       setLastSearchRange,
       setCustomSearchRange,
+      updateGeolocation,
     ]);
 
     const SmartCollectionRouteList = useMemo(

@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { LatLngExpression } from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -8,7 +8,7 @@ import {
   MapContainer,
   Marker,
   TileLayer,
-  useMapEvent
+  useMapEvent,
 } from "react-leaflet";
 import { defaultLocation } from "../../utils";
 
@@ -36,8 +36,8 @@ function DisplayPosition({ map, onMove }) {
   }, [map, onMove]);
 
   return (
-    <Button style={{ flex: 1 }} variant="outlined" onClick={onClick}>
-      返回原有位置
+    <Button style={{ width: "100%" }} variant="outlined" onClick={onClick}>
+      當前位置
     </Button>
   );
 }
@@ -52,18 +52,14 @@ function SetViewOnClick({ map, animateRef }) {
   return null;
 }
 
-export const BasicMap = ({ range }) => {
+export const BasicMap = ({ range, position, setPosition }) => {
   const animateRef = useRef(true);
 
   const [map, setMap] = useState(null);
-  const [position, setPosition] = useState<LatLngExpression>({
-    lat: defaultLocation.lat,
-    lng: defaultLocation.lng,
-  });
 
   const handleMove = useCallback(() => {
     setPosition(map.getCenter());
-  }, [map]);
+  }, [map, setPosition]);
 
   const displayMap = useMemo(
     () => (
@@ -88,28 +84,28 @@ export const BasicMap = ({ range }) => {
 
   return (
     <>
-      {displayMap}
       {map ? (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 2,
-            padding: 2,
-          }}
+        <Grid
+          container
+          sx={{ px: 4, py: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <label style={{ flex: 1 }}>
-            <input
-              type="checkbox"
-              onChange={() => {
-                animateRef.current = !animateRef.current;
-              }}
-            />
-            減少動態效果
-          </label>
-          <DisplayPosition map={map} onMove={handleMove} />
-        </Box>
+          <Grid item xs={6}>
+            <DisplayPosition map={map} onMove={handleMove} />
+          </Grid>
+          <Grid item xs={6}>
+            <label>
+              <input
+                type="checkbox"
+                onChange={() => {
+                  animateRef.current = !animateRef.current;
+                }}
+              />
+              減少動態效果
+            </label>
+          </Grid>
+        </Grid>
       ) : null}
+      {displayMap}
     </>
   );
 };
