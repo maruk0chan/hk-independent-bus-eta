@@ -3,6 +3,7 @@ import { LatLngExpression } from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Circle,
   MapContainer,
@@ -20,6 +21,8 @@ const defaultCenter = [
 const zoom = 14;
 
 function DisplayPosition({ map, onMove }) {
+  const { t } = useTranslation();
+
   const onClick = useCallback(() => {
     map.setView(defaultCenter, zoom);
   }, [map]);
@@ -36,8 +39,23 @@ function DisplayPosition({ map, onMove }) {
   }, [map, onMove]);
 
   return (
-    <Button style={{ width: "100%" }} variant="outlined" onClick={onClick}>
-      當前位置
+    <Button
+      disableRipple
+      style={{ width: "100%" }}
+      variant="outlined"
+      sx={({ palette }) => {
+        return {
+          color: palette.secondary.main,
+          borderColor: palette.secondary.main,
+          "&.MuiButton-outlined:hover": {
+            color: palette.secondary.main,
+            borderColor: palette.secondary.main,
+          },
+        };
+      }}
+      onClick={onClick}
+    >
+      {t("當前位置")}
     </Button>
   );
 }
@@ -53,6 +71,8 @@ function SetViewOnClick({ map, animateRef }) {
 }
 
 export const BasicMap = ({ range, position, setPosition }) => {
+  const { t } = useTranslation();
+
   const animateRef = useRef(true);
 
   const [map, setMap] = useState(null);
@@ -87,20 +107,31 @@ export const BasicMap = ({ range, position, setPosition }) => {
       {map ? (
         <Grid
           container
-          sx={{ px: 4, py: 1, justifyContent: "center", alignItems: "center" }}
+          sx={{
+            px: { xs: 2, md: 4 },
+            py: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
           <Grid item xs={6}>
             <DisplayPosition map={map} onMove={handleMove} />
           </Grid>
-          <Grid item xs={6}>
-            <label>
+          <Grid
+            item
+            xs={6}
+            sx={{
+              textAlign: "center",
+            }}
+          >
+            <label style={{ display: "block" }}>
               <input
                 type="checkbox"
                 onChange={() => {
                   animateRef.current = !animateRef.current;
                 }}
               />
-              減少動態效果
+              {t("減少動態效果")}
             </label>
           </Grid>
         </Grid>

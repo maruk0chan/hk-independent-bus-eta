@@ -46,6 +46,7 @@ import SuccinctTimeReport from "./SuccinctTimeReport";
 
 interface SwipeableListProps {
   geolocation: Location;
+  setGeolocation: React.Dispatch<React.SetStateAction<Location>>;
   homeTab: HomeTabType;
   onChangeTab: (v: string) => void;
 }
@@ -68,7 +69,7 @@ interface SelectedRoutes {
 export const searchRangeOptions = [100, 200, 500];
 
 const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
-  ({ geolocation, homeTab, onChangeTab }, ref) => {
+  ({ geolocation, setGeolocation, homeTab, onChangeTab }, ref) => {
     const {
       savedEtas,
       db: { holidays, routeList, stopList, serviceDayMap },
@@ -78,7 +79,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       setLastSearchRange,
       customSearchRange,
       setCustomSearchRange,
-      updateGeolocation,
+      setManualGeolocation,
     } = useContext(AppContext);
     const isTodayHoliday = useMemo(
       () => isHoliday(holidays, new Date()),
@@ -271,8 +272,17 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
               position={position}
               setPosition={setPosition}
             ></BasicMap>
-            <Grid container sx={{ px: 4, py: 1, mt: 2 }} spacing={1}>
-              <Grid item xs={12}>
+            <Grid
+              container
+              sx={{
+                px: { xs: 2, md: 4 },
+                py: 1,
+                mt: 2,
+                justifyContent: "center",
+              }}
+              spacing={1}
+            >
+              <Grid item xs={10}>
                 <Slider
                   sx={{
                     "& .MuiSlider-mark": {
@@ -298,7 +308,15 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                   onChange={(e, value) => setInputValue(value.toString())}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid
+                item
+                xs={6}
+                sx={{
+                  px: { xs: 2, md: 4 },
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <input
                   style={{ fontSize: "16px", width: "100%", height: "100%" }}
                   type="number"
@@ -332,7 +350,8 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                     const range = parseInt(inputValue);
                     setLastSearchRange(range);
                     setCustomSearchRange(range);
-                    updateGeolocation({ lat: 22.33971, lng: 114.20154 });
+                    setGeolocation(position);
+                    setManualGeolocation(position);
                     setOpen(false);
                   }}
                 >
@@ -355,7 +374,8 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       customSearchRange,
       setLastSearchRange,
       setCustomSearchRange,
-      updateGeolocation,
+      setGeolocation,
+      setManualGeolocation,
     ]);
 
     const SmartCollectionRouteList = useMemo(
