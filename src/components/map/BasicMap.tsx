@@ -1,4 +1,4 @@
-import { FormControlLabel, Grid, Switch } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import type { Location as GeoLocation } from "hk-bus-eta";
 import Leaflet, { LatLngExpression } from "leaflet";
 import "leaflet-defaulticon-compatibility";
@@ -34,17 +34,8 @@ const zoom = 14;
 // the higher the number, the harder to get real and custom location the same
 const coordinateDecimal = 3;
 
-function DisplayPosition({
-  map,
-  geolocation,
-  isCurrentGeolocation,
-  position,
-  setIsCurrentGeolocation,
-  onMove,
-}) {
+function DisplayPosition({ map, geolocation, isCurrentGeolocation, onMove }) {
   const { t } = useTranslation();
-
-  const [customGeolocation, setCustomGeolocation] = useState(defaultLocation);
 
   useEffect(() => {
     map.on("move", onMove);
@@ -54,29 +45,17 @@ function DisplayPosition({
   }, [map, onMove]);
 
   return (
-    <>
-      <FormControlLabel
-        control={
-          <Switch
-            checked={!isCurrentGeolocation}
-            onChange={(_, checked) => {
-              if (checked) {
-                map.setView(customGeolocation, zoom);
-                setIsCurrentGeolocation(false);
-                console.log("on", geolocation, position);
-              } else {
-                // save custom location when turning off
-                setCustomGeolocation(position);
-                map.setView(geolocation || defaultCenter, zoom);
-                console.log("off", geolocation, position);
-              }
-            }}
-            defaultChecked
-          />
-        }
-        label={!isCurrentGeolocation ? t("自訂位置") : t("現在位置")}
-      />
-    </>
+    <Button
+      disableRipple
+      style={{ width: "100%" }}
+      variant="contained"
+      disabled={isCurrentGeolocation}
+      onClick={() => {
+        map.setView(geolocation || defaultCenter, zoom);
+      }}
+    >
+      {t("現在 / 預設位置")}
+    </Button>
   );
 }
 
@@ -174,8 +153,6 @@ export const BasicMap = ({ range, position, setPosition }) => {
               map={map}
               geolocation={geolocation}
               isCurrentGeolocation={isCurrentGeolocation}
-              setIsCurrentGeolocation={setIsCurrentGeolocation}
-              position={position}
               onMove={debounce(() => {
                 handleMove();
               }, 100)}
