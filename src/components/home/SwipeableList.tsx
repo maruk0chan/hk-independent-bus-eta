@@ -4,6 +4,8 @@ import {
   Dialog,
   DialogTitle,
   Grid,
+  Input,
+  InputLabel,
   List,
   Paper,
   Slider,
@@ -40,6 +42,7 @@ import { coToType, getDistance, getDistanceWithUnit } from "../../utils";
 import { CircularProgress } from "../Progress";
 import { BasicMap } from "../map/BasicMap";
 import { dialogRootSx, dialogTitleSx } from "../ui/dialog";
+import { inputSx } from "../ui/input";
 import HomeRouteListDropDown from "./HomeRouteList";
 import type { HomeTabType } from "./HomeTabbar";
 import SuccinctTimeReport from "./SuccinctTimeReport";
@@ -283,11 +286,11 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
               container
               sx={{
                 px: { xs: 2, md: 4 },
-                py: 1,
-                mt: 2,
+                mt: 4,
                 justifyContent: "center",
+                alignItems: "center",
               }}
-              spacing={1}
+              // spacing={1}
             >
               <Grid item xs={10}>
                 <Slider
@@ -315,39 +318,64 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                   onChange={(e, value) => setInputValue(value.toString())}
                 />
               </Grid>
-              <Grid
-                item
-                xs={6}
-                sx={{
-                  px: { xs: 2, md: 4 },
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <input
-                  style={{ fontSize: "16px", width: "100%", height: "100%" }}
-                  type="number"
-                  defaultValue={customSearchRange}
-                  value={inputValue}
-                  min="0"
-                  max="9999"
-                  step={100}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const numericalValue = parseInt(value);
-                    const [min, max] = [0, 9999];
-                    if (numericalValue <= min) {
-                      setInputValue(min.toString());
-                    } else if (numericalValue >= max) {
-                      setInputValue(max.toString());
-                    } else setInputValue(value);
-                  }}
-                />
-              </Grid>
+            </Grid>
+            <Grid
+              container
+              sx={{
+                px: { xs: 2, md: 4 },
+                pb: 2,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              spacing={2}
+            >
               <Grid item xs={6}>
+                <Grid
+                  container
+                  sx={{
+                    justifyContent: "center",
+                    alignItems: "end",
+                  }}
+                >
+                  <Grid item xs={7}>
+                    {t("搜尋範圍")}:
+                  </Grid>
+                  <Grid item xs={5}>
+                    <Input
+                      type="number"
+                      defaultValue={customSearchRange}
+                      value={inputValue}
+                      placeholder={"750"}
+                      sx={{
+                        ...inputSx,
+                        "& input": {
+                          textAlign: "end",
+                        },
+                      }}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numericalValue = parseInt(value);
+                        const [min, max] = [0, 9999];
+                        if (numericalValue <= min) {
+                          setInputValue(min.toString());
+                        } else if (numericalValue >= max) {
+                          setInputValue(max.toString());
+                        } else setInputValue(value);
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+
+              {/* <InputLabel htmlFor="search-range" sx={{ fontSize: "10px" }}>
+                  {t("搜尋範圍")}
+                </InputLabel> */}
+
+              <Grid item xs={6} sx={{ mb: -1 }}>
                 <Button
                   disableRipple
                   variant="contained"
+                  size="small"
                   sx={{
                     color: "black",
                     width: "100%",

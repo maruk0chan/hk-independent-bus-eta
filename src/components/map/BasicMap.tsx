@@ -1,3 +1,4 @@
+import MyLocationIcon from "@mui/icons-material/MyLocation";
 import { Button, Grid } from "@mui/material";
 import type { Location as GeoLocation } from "hk-bus-eta";
 import Leaflet, { LatLngExpression } from "leaflet";
@@ -53,17 +54,11 @@ function DisplayPosition({ map, geolocation, isCurrentGeolocation, onMove }) {
       onClick={() => {
         map.setView(geolocation || defaultCenter, zoom);
       }}
-      sx={({ palette }) => {
-        return {
-          color: palette.secondary.main,
-          borderColor: palette.secondary.main,
-          "&.MuiButton-outlined:hover": {
-            color: palette.secondary.main,
-            borderColor: palette.secondary.main,
-          },
-        };
+      sx={{
+        color: "black",
       }}
     >
+      <MyLocationIcon sx={{ mr: 1 }} />
       {t("現在 / 預設位置")}
     </Button>
   );
