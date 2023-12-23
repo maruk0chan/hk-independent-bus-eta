@@ -1,10 +1,10 @@
 import { FormControlLabel, Grid, Switch } from "@mui/material";
-import { LatLngExpression } from "leaflet";
+import type { Location as GeoLocation } from "hk-bus-eta";
+import Leaflet, { LatLngExpression } from "leaflet";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import debounce from "lodash.debounce";
 import isEqual from "lodash.isequal";
-import type { Location as GeoLocation } from "hk-bus-eta";
 import {
   useCallback,
   useContext,
@@ -105,11 +105,9 @@ function roundDownLocationCoordinates(
 }
 
 export const BasicMap = ({ range, position, setPosition }) => {
-  const { t } = useTranslation();
-
   const animateRef = useRef(true);
 
-  const { geolocation } = useContext(AppContext);
+  const { geolocation, colorMode } = useContext(AppContext);
 
   const [map, setMap] = useState(null);
   const [isCurrentGeolocation, setIsCurrentGeolocation] = useState(
@@ -139,15 +137,24 @@ export const BasicMap = ({ range, position, setPosition }) => {
         ref={setMap}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          crossOrigin="anonymous"
+          maxZoom={Leaflet.Browser.retina ? 20 : 19}
+          maxNativeZoom={18}
+          keepBuffer={10}
+          updateWhenIdle={false}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url={
+            colorMode === "light"
+              ? process.env.REACT_APP_OSM_PROVIDER_URL
+              : process.env.REACT_APP_OSM_PROVIDER_URL_DARK
+          }
         />
         <Marker position={position}></Marker>
         <Circle center={position} radius={range} />
         <SetViewOnClick map={map} animateRef={animateRef} />
       </MapContainer>
     ),
-    [map, position, range]
+    [colorMode, map, position, range]
   );
 
   return (
@@ -162,7 +169,7 @@ export const BasicMap = ({ range, position, setPosition }) => {
             alignItems: "center",
           }}
         >
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <DisplayPosition
               map={map}
               geolocation={geolocation}
@@ -173,23 +180,6 @@ export const BasicMap = ({ range, position, setPosition }) => {
                 handleMove();
               }, 100)}
             />
-          </Grid>
-          <Grid
-            item
-            xs={6}
-            sx={{
-              textAlign: "center",
-            }}
-          >
-            <label style={{ display: "block" }}>
-              <input
-                type="checkbox"
-                onChange={() => {
-                  animateRef.current = !animateRef.current;
-                }}
-              />
-              {t("減少動態效果")}
-            </label>
           </Grid>
         </Grid>
       ) : null}
