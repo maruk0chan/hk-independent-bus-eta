@@ -53,6 +53,16 @@ function DisplayPosition({ map, geolocation, isCurrentGeolocation, onMove }) {
       onClick={() => {
         map.setView(geolocation || defaultCenter, zoom);
       }}
+      sx={({ palette }) => {
+        return {
+          color: palette.secondary.main,
+          borderColor: palette.secondary.main,
+          "&.MuiButton-outlined:hover": {
+            color: palette.secondary.main,
+            borderColor: palette.secondary.main,
+          },
+        };
+      }}
     >
       {t("現在 / 預設位置")}
     </Button>
