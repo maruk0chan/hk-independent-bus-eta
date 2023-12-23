@@ -80,6 +80,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       customSearchRange,
       setCustomSearchRange,
       setManualGeolocation,
+      setIsManualGeolocation,
     } = useContext(AppContext);
     const isTodayHoliday = useMemo(
       () => isHoliday(holidays, new Date()),
@@ -96,7 +97,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       isCustomRange ? "custom" : lastSearchRange
     );
     const [inputValue, setInputValue] = useState<string>(
-      isCustomRange ? customSearchRange?.toString() : ""
+      isCustomRange ? customSearchRange?.toString() : "750"
     );
     const [position, setPosition] = useState(geolocation);
     const [hasNoNearbyRoutes, setHasNoNearbyRoutes] = useState(true);
@@ -157,6 +158,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                   disableRipple
                   value={range}
                   aria-label={range.toString()}
+                  onClick={() => setIsManualGeolocation(false)}
                 >
                   {distance}
                 </ToggleButton>
@@ -167,7 +169,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
               sx={toggleButtonSx}
               disableRipple
               value={"custom"}
-              aria-label={lastSearchRange.toString()}
+              aria-label={"custom"}
               onClick={(e) => {
                 const hasCustomSearchRange = customSearchRange > 0;
                 const isCustom = selectedRange === "custom";
@@ -175,11 +177,13 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                 if (hasCustomSearchRange) {
                   setSelectedRange("custom");
                   setLastSearchRange(customSearchRange);
+                  setIsManualGeolocation(true);
                   if (isCustom) {
                     setOpen(true);
                   }
                 } else if (!isCustom && hasCustomSearchRange) {
                   setSelectedRange("custom");
+                  setIsManualGeolocation(true);
                 } else setOpen(true);
               }}
             >
@@ -192,8 +196,8 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       );
     }, [
       customSearchRange,
-      lastSearchRange,
       selectedRange,
+      setIsManualGeolocation,
       setLastSearchRange,
       t,
     ]);
@@ -352,6 +356,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
                     setCustomSearchRange(range);
                     setGeolocation(position);
                     setManualGeolocation(position);
+                    setIsManualGeolocation(true);
                     setOpen(false);
                   }}
                 >
@@ -376,6 +381,7 @@ const SwipeableList = React.forwardRef<SwipeableListRef, SwipeableListProps>(
       setCustomSearchRange,
       setGeolocation,
       setManualGeolocation,
+      setIsManualGeolocation,
     ]);
 
     const SmartCollectionRouteList = useMemo(
